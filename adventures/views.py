@@ -33,7 +33,6 @@ class MyAdventuresView(APIView):
         #get only elements used by user
         myadventures = MyAdventures.objects.filter(userid__exact=userid)
 
-
         myadventureserializer = MyAdventuresSerializer(myadventures, many=True)
 
         return Response(myadventureserializer.data)

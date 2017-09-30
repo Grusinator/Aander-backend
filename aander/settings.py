@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'adventures.apps.AdventuresConfig'
+    'rest_framework.authtoken',
+    'adventures.apps.AdventuresConfig',
+    'users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
