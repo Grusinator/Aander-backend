@@ -21,7 +21,7 @@ from adventures import views
 
 
 api_urls = [
-    url(r'^adventures/', include('adventures.urls', namespace='adventures')),
+    url(r'^adventures/', include('adventures.urls', namespace='adventure')),
     url(r'^users/', include('users.urls', namespace='users')),
 ]
 

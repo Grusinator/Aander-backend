@@ -5,62 +5,181 @@ from itertools import chain
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Adventures, MyAdventures,Clues,Locations,User
-from .serializers import AdventuresSerializer, MyAdventuresSerializer, CluesSerializer, LocationsSerializer, UsersSerializer
+from .models import Adventure, MyAdventure,Clue,Location
+# from .serializers import Adventureerializer, MyAdventureerializer, CluesSerializer, LocationsSerializer, UsersSerializer
+from .serializers import CluesSerializer, LocationsSerializer, UsersSerializer
 from rest_framework.decorators import api_view
 
 
-class AdventuresList(APIView):
-    def get(self, response):
-        adventures = Adventures.objects.all()
-        serializer = AdventuresSerializer(adventures, many=True)
-        return Response(serializer.data)
 
-    def post(self, request):
-        serializer = AdventuresSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    UpdateAPIView,
+    RetrieveAPIView,
+    RetrieveUpdateAPIView
+    )
 
-class MyAdventuresView(APIView):
-    def get(self, response):
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAdminUser,
+    IsAuthenticatedOrReadOnly,
+    )
 
-        userid = 1
+from .permissions import IsOwnerOrReadOnly
 
-        #get only elements used by user
-        myadventures = MyAdventures.objects.filter(userid__exact=userid)
+from .serializers import (
+    AdventureCreateUpdateSerializer,
+    AdventureDetailSerializer,
+    AdventureListSerializer
+    )
 
-        myadventureserializer = MyAdventuresSerializer(myadventures, many=True)
-
-        return Response(myadventureserializer.data)
-
-    def post(self, request):
-        serializer = MyAdventuresSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+from .serializers import (
+    MyAdventureCreateUpdateSerializer,
+    MyAdventureDetailSerializer,
+    MyAdventureListSerializer
+    )
 
 
-class UsersView(APIView):
-    def get(self, response):
-        user = User.objects.all()
-        serializer = UsersSerializer(user, many=False)
-        return Response(serializer.data)
+# class AdventureList(APIView):
+#     def get(self, response):
+#         Adventure = Adventure.objects.all()
+#         serializer = Adventureerializer(Adventure, many=True)
+#         return Response(serializer.data)
+#
+#     def post(self, request):
+#         serializer = Adventureerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(
+#                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request):
-        serializer = UsersSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#new type of api setup from codingforentrepreneurs
+
+class AdventureCreateAPIView(CreateAPIView):
+    queryset = Adventure.objects.all()
+    serializer_class = AdventureCreateUpdateSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def perform_create(self, serializer):
+        serializer.save()#user=self.request.user)
+
+
+class AdventureDetailAPIView(RetrieveAPIView):
+    queryset = Adventure.objects.all()
+    serializer_class = AdventureDetailSerializer
+    #lookup_field = 'slug'
+    #lookup_url_kwarg = "abc"
+
+
+class AdventureUpdateAPIView(RetrieveUpdateAPIView):
+    queryset = Adventure.objects.all()
+    serializer_class = AdventureCreateUpdateSerializer
+    #lookup_field = 'slug'
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminUser]
+    #lookup_url_kwarg = "abc"
+    def perform_update(self, serializer):
+        serializer.save()#user=self.request.user)
+
+
+class AdventureDeleteAPIView(DestroyAPIView):
+    queryset = Adventure.objects.all()
+    serializer_class = AdventureDetailSerializer
+    #lookup_field = 'slug'
+    #lookup_url_kwarg = "abc"
+
+
+class AdventureListAPIView(ListAPIView):
+    queryset = Adventure.objects.all()
+    serializer_class = AdventureListSerializer
+
+    #def get_queryset()
+
+
+
+#myAdventure
+
+class MyAdventureCreateAPIView(CreateAPIView):
+    queryset = MyAdventure.objects.all()
+    serializer_class = MyAdventureCreateUpdateSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class MyAdventureDetailAPIView(RetrieveAPIView):
+    queryset = MyAdventure.objects.all()
+    serializer_class = MyAdventureDetailSerializer
+    #lookup_field = 'slug'
+    #lookup_url_kwarg = "abc"
+
+
+class MyAdventureUpdateAPIView(RetrieveUpdateAPIView):
+    queryset = MyAdventure.objects.all()
+    serializer_class = MyAdventureCreateUpdateSerializer
+    #lookup_field = 'slug'
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    #lookup_url_kwarg = "abc"
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class MyAdventureDeleteAPIView(DestroyAPIView):
+    queryset = MyAdventure.objects.all()
+    serializer_class = MyAdventureDetailSerializer
+    #lookup_field = 'slug'
+    #lookup_url_kwarg = "abc"
+
+
+class MyAdventureListAPIView(ListAPIView):
+    queryset = MyAdventure.objects.all()
+    serializer_class = MyAdventureListSerializer
+
+    #def get_queryset()
+
+
+
+# class MyAdventureView(APIView):
+#     def get(self, response):
+#
+#         #get only elements used by user
+#         myAdventure = MyAdventure.objects.filter(user=self.request.user)
+#
+#         myAdventureerializer = MyAdventureerializer(myAdventure, many=True)
+#
+#         return Response(myAdventureerializer.data)
+#
+#     def post(self, request):
+#         serializer = MyAdventureerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(
+#                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# class UsersView(APIView):
+#     def get(self, response):
+#         user = User.objects.all()
+#         serializer = UsersSerializer(user, many=False)
+#         return Response(serializer.data)
+#
+#     def post(self, request):
+#         serializer = UsersSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(
+#                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # @api_view(['GET', 'POST'])
 # def task_list(request):
 #     """
