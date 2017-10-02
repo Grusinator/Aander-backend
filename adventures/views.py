@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Adventure, MyAdventure,Clue,Location
 # from .serializers import Adventureerializer, MyAdventureerializer, CluesSerializer, LocationsSerializer, UsersSerializer
-from .serializers import CluesSerializer, LocationsSerializer, UsersSerializer
+from .serializers import CluesDetailSerializer, LocationsSerializer, UsersSerializer
 from rest_framework.decorators import api_view
 
 
@@ -140,7 +140,7 @@ class MyAdventureDeleteAPIView(DestroyAPIView):
 
 class MyAdventureListAPIView(ListAPIView):
     queryset = MyAdventure.objects.all()
-    serializer_class = MyAdventureListSerializer
+    serializer_class = MyAdventureDetailSerializer #MyAdventureListSerializer
 
     #def get_queryset()
 
